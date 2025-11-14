@@ -27,6 +27,7 @@ const ObjectifCard = ({ objectif, onEdit, onDelete }: ObjectifCardProps) => {
   const progress = objectif.progressionPourcentage;
   const isCompleted = objectif.statut === StatutObjectif.TERMINE;
 
+  // ✅ CORRECTION : Ajout d'une valeur par défaut
   const colorClasses = {
     blue: { bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-50' },
     green: { bg: 'bg-green-500', text: 'text-green-600', light: 'bg-green-50' },
@@ -36,12 +37,13 @@ const ObjectifCard = ({ objectif, onEdit, onDelete }: ObjectifCardProps) => {
     pink: { bg: 'bg-pink-500', text: 'text-pink-600', light: 'bg-pink-50' },
     yellow: { bg: 'bg-yellow-500', text: 'text-yellow-600', light: 'bg-yellow-50' },
     gray: { bg: 'bg-gray-500', text: 'text-gray-600', light: 'bg-gray-50' },
-  }[details.color];
+  }[details.color] || { bg: 'bg-gray-500', text: 'text-gray-600', light: 'bg-gray-50' }; // ✅ Valeur par défaut
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-xl transition-all duration-300">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
+          {/* ✅ Maintenant colorClasses ne sera jamais undefined */}
           <div className={`p-3 rounded-full ${colorClasses.bg} text-white`}>
             <IconComponent size={20} />
           </div>
@@ -53,7 +55,6 @@ const ObjectifCard = ({ objectif, onEdit, onDelete }: ObjectifCardProps) => {
           </div>
         </div>
         
-        {/* ❌ Bouton modifier supprimé — on garde seulement supprimer */}
         <button 
           onClick={() => onDelete(objectif.id)}
           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"

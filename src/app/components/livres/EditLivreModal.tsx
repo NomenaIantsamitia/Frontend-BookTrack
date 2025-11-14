@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { X, Upload, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 import api from "@/lib/axios";
 import { Livre } from "@/app/utils/livreUtils";
 
@@ -50,7 +51,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mettre à jour la prévisualisation quand le livre change
   useEffect(() => {
     setPreviewImage(livre.couvertureUrl || "");
     setForm({
@@ -76,13 +76,11 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Vérifier le type de fichier
     if (!file.type.startsWith('image/')) {
       alert("Veuillez sélectionner une image valide");
       return;
     }
 
-    // Vérifier la taille (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert("L'image ne doit pas dépasser 5MB");
       return;
@@ -91,14 +89,12 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
     try {
       setUploading(true);
       
-      // Créer une prévisualisation locale
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
       
-      // Stocker le fichier pour l'envoyer plus tard avec le formulaire
       setSelectedFile(file);
       
     } catch (error) {
@@ -108,6 +104,7 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
       setUploading(false);
     }
   };
+
   const handleSubmit = async () => {
     if (!form.titre.trim() || !form.auteur.trim()) {
       alert("Le titre et l'auteur sont obligatoires");
@@ -124,12 +121,10 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
       
       let updatedLivre;
   
-      // ✅ CAS 1: Nouvelle image à uploader
       if (selectedFile) {
         const formData = new FormData();
         formData.append('file', selectedFile);
         
-        // Ajouter les autres données du formulaire au FormData
         formData.append('titre', form.titre);
         formData.append('auteur', form.auteur);
         formData.append('genre', form.genre);
@@ -144,9 +139,7 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
         });
         
         updatedLivre = uploadResponse.data;
-      } 
-      // ✅ CAS 2: Pas de nouvelle image, juste mettre à jour les infos
-      else {
+      } else {
         const updateData = {
           titre: form.titre,
           auteur: form.auteur,
@@ -154,7 +147,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
           categorie: form.categorie,
           description: form.description,
           totalPages: form.totalPages || undefined,
-          // couvertureUrl reste inchangé
         };
   
         const res = await api.put(`/livres/${livre.id}`, updateData);
@@ -171,6 +163,7 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
       setLoading(false);
     }
   };
+
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
@@ -178,7 +171,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="flex justify-between items-center p-6 border-b dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Modifier le livre
@@ -193,15 +185,15 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
 
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Colonne de gauche - Image */}
             <div className="lg:col-span-1">
               <div className="space-y-4">
-                {/* Prévisualisation de l'image */}
                 <div className="aspect-[3/4] bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-600">
                   {previewImage ? (
-                    <img
+                    <Image
                       src={previewImage}
                       alt="Couverture"
+                      width={300}
+                      height={400}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -211,7 +203,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                   )}
                 </div>
 
-                {/* Upload d'image */}
                 <div className="space-y-2">
                   <input
                     type="file"
@@ -239,7 +230,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                   )}
                 </div>
 
-                {/* Informations de lecture (non modifiables) */}
                 <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-2">
                     Progression de lecture
@@ -267,10 +257,8 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
               </div>
             </div>
 
-            {/* Colonne de droite - Formulaire */}
             <div className="lg:col-span-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Titre */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Titre *
@@ -285,7 +273,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                   />
                 </div>
 
-                {/* Auteur */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Auteur *
@@ -300,7 +287,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                   />
                 </div>
 
-                {/* Genre */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Genre
@@ -319,7 +305,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                   </select>
                 </div>
 
-                {/* Total de pages */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Total de pages
@@ -334,7 +319,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                   />
                 </div>
 
-                {/* Catégorie */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Catégorie
@@ -349,7 +333,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                   />
                 </div>
 
-                {/* Description */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Description
@@ -365,7 +348,6 @@ export default function EditLivreModal({ livre, onClose, onUpdate }: EditLivreMo
                 </div>
               </div>
 
-              {/* Bouton de soumission */}
               <div className="flex gap-3 mt-6 pt-4 border-t dark:border-gray-700">
                 <button
                   type="button"

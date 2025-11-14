@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Settings, Edit, AlertCircle } from "lucide-react";
 import { User } from "@/types/profile";
@@ -19,7 +21,7 @@ export const ProfileForm = ({ user, onUpdate }: ProfileFormProps) => {
     nouveauMotDePasse: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // ⚠️ état pour erreur
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,13 +31,12 @@ export const ProfileForm = ({ user, onUpdate }: ProfileFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setErrorMessage(null); // Réinitialiser l’erreur avant envoi
+    setErrorMessage(null);
 
     try {
       await onUpdate(formData);
       setIsEditing(false);
     } catch (err: any) {
-      // 👇 Récupérer message du backend
       const message =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
@@ -62,7 +63,6 @@ export const ProfileForm = ({ user, onUpdate }: ProfileFormProps) => {
         </button>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* === Champ nom === */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Nom</label>
             <input
@@ -75,7 +75,6 @@ export const ProfileForm = ({ user, onUpdate }: ProfileFormProps) => {
             />
           </div>
 
-          {/* === Ancien mot de passe === */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Ancien mot de passe
@@ -90,7 +89,6 @@ export const ProfileForm = ({ user, onUpdate }: ProfileFormProps) => {
             />
           </div>
 
-          {/* === Nouveau mot de passe === */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Nouveau mot de passe
@@ -105,7 +103,6 @@ export const ProfileForm = ({ user, onUpdate }: ProfileFormProps) => {
             />
           </div>
 
-          {/* ⚠️ Affichage du message d’erreur */}
           {errorMessage && (
             <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
               <AlertCircle size={18} />
@@ -113,7 +110,6 @@ export const ProfileForm = ({ user, onUpdate }: ProfileFormProps) => {
             </div>
           )}
 
-          {/* === Boutons === */}
           <div className="flex gap-3 pt-2">
             <button
               type="submit"

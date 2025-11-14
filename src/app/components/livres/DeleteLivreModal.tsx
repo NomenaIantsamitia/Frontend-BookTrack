@@ -39,7 +39,7 @@ export default function DeleteLivreModal({
               <p className="text-gray-500 dark:text-gray-300 text-sm">
                 Êtes-vous sûr de vouloir supprimer
                 <br />
-                <strong>"{titreLivre}"</strong> ?
+                <strong>&ldquo;{titreLivre}&rdquo;</strong> ?
                 <br />
                 Cette action est <strong>irréversible</strong>.
               </p>

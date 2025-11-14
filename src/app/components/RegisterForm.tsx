@@ -10,6 +10,13 @@ interface RegisterFormProps {
   setIsLogin: (val: boolean) => void;
 }
 
+interface RegisterFormData {
+  nom: string;
+  email: string;
+  motDePasse: string;
+  codeVerification: string;
+}
+
 export default function RegisterForm({
   step,
   setStep,
@@ -17,18 +24,18 @@ export default function RegisterForm({
   setIsLogin,
 }: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<RegisterFormData>({
     nom: "",
     email: "",
     motDePasse: "",
     codeVerification: "",
   });
 
-  const handleChange = (e: any) =>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   // Étape 1 : envoyer le code
-  const sendCode = async (e: any) => {
+  const sendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
@@ -37,14 +44,14 @@ export default function RegisterForm({
       setMessage("📧 Code envoyé à votre email !");
       setStep(2);
     } catch {
-      setMessage("❌ Email invalide ou erreur d’envoi.");
+      setMessage("❌ Email invalide ou erreur d&apos;envoi.");
     } finally {
       setLoading(false);
     }
   };
 
   // Étape 2 : création du compte
-  const register = async (e: any) => {
+  const register = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
@@ -55,7 +62,7 @@ export default function RegisterForm({
       setStep(1);
     } catch (err: any) {
       setMessage(
-        err.response?.data?.message || "❌ Code invalide ou erreur d’inscription."
+        err.response?.data?.message || "❌ Code invalide ou erreur d&apos;inscription."
       );
     } finally {
       setLoading(false);
@@ -75,7 +82,7 @@ export default function RegisterForm({
           value={form.email}
           onChange={handleChange}
           required
-          disabled={step === 2} // Empêche de changer à l’étape 2
+          disabled={step === 2} // Empêche de changer à l&apos;étape 2
           placeholder="votre.email@exemple.com"
           className="block w-full p-3 border border-gray-300 rounded-xl bg-gray-50 dark:bg-gray-700 disabled:opacity-60"
         />
@@ -127,10 +134,10 @@ export default function RegisterForm({
 
           <button
             type="button"
-            onClick={() => setStep(1)} // bouton pour revenir à l’étape 1
+            onClick={() => setStep(1)} // bouton pour revenir à l&apos;étape 1
             className="text-indigo-600 hover:underline text-sm"
           >
-            ← Modifier l’adresse email
+            ← Modifier l&apos;adresse email
           </button>
         </>
       )}

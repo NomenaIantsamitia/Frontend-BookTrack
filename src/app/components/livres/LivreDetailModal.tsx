@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, BookOpen, User, Calendar, Star } from "lucide-react";
 import { Livre } from "@/app/utils/livreUtils";
+import Image from "next/image";
 
 interface LivreDetailModalProps {
   isOpen: boolean;
@@ -72,10 +73,13 @@ export default function LivreDetailModal({
             <div className="flex flex-col md:flex-row p-6 gap-6">
               {/* Couverture */}
               <div className="flex-shrink-0 w-full md:w-1/3">
-                <img
+                <Image
                   src={livre.couvertureUrl || "/placeholder-book.jpg"}
                   alt={livre.titre}
+                  width={300}
+                  height={288}
                   className="rounded-xl w-full h-72 object-cover shadow-md"
+                  priority={false}
                 />
               </div>
 
@@ -148,7 +152,7 @@ export default function LivreDetailModal({
                       className="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl shadow-sm"
                     >
                       <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                        “{avis.contenu || "Pas de commentaire"}”
+                        &ldquo;{avis.contenu || "Pas de commentaire"}&rdquo;
                       </p>
                       <div className="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>{avis.utilisateur?.nom}</span>

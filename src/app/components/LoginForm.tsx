@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // ✅ Import pour la redirection
+import { useRouter } from "next/navigation";
 import { Mail, Lock } from "lucide-react";
 import api from "@/lib/axios";
 
@@ -9,15 +9,20 @@ interface LoginFormProps {
   setMessage: (msg: string) => void;
 }
 
-export default function LoginForm({ setMessage }: LoginFormProps) {
-  const router = useRouter(); // ✅ Hook de navigation
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", motDePasse: "" });
+interface LoginFormData {
+  email: string;
+  motDePasse: string;
+}
 
-  const handleChange = (e: any) =>
+export default function LoginForm({ setMessage }: LoginFormProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState<LoginFormData>({ email: "", motDePasse: "" });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
@@ -25,12 +30,10 @@ export default function LoginForm({ setMessage }: LoginFormProps) {
     try {
       const res = await api.post("/auth/login", form);
 
-      // ✅ Sauvegarde du token
       localStorage.setItem("token", res.data.access_token);
       localStorage.setItem("user", JSON.stringify(res.data.utilisateur));
       setMessage("✅ Connexion réussie !");
 
-      // ✅ Redirection vers dashboard
       router.push("/dashboard");
     } catch (err: any) {
       setMessage(err.response?.data?.message || "❌ Erreur de connexion.");

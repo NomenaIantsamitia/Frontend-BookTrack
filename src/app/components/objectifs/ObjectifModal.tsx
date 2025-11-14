@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { Objectif, TypeObjectif } from "../../../types/objectifTypes";
@@ -5,9 +7,19 @@ import { Objectif, TypeObjectif } from "../../../types/objectifTypes";
 interface ObjectifModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: any, isEditing: boolean, id?: string) => void;
+  onSave: (data: ObjectifFormData, isEditing: boolean, id?: string) => void;
   objectif?: Objectif | null;
   loading?: boolean;
+}
+
+interface ObjectifFormData {
+  titre: string;
+  description: string;
+  type: TypeObjectif;
+  valeurCible: number;
+  dateDebut: string;
+  dateFin: string;
+  utilisateurId: string;
 }
 
 const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifModalProps) => {
@@ -15,7 +27,7 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
 
   const today = new Date().toISOString().split("T")[0];
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ObjectifFormData>({
     titre: "",
     description: "",
     type: TypeObjectif.LIVRES_LUS,
@@ -50,14 +62,13 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
         utilisateurId,
       });
     }
-  }, [objectif]);
+  }, [objectif, today]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation logique avant sauvegarde
     if (formData.dateDebut < today) {
-      alert("La date de début ne peut pas être antérieure à aujourd'hui.");
+      alert("La date de début ne peut pas être antérieure à aujourd&apos;hui.");
       return;
     }
 
@@ -76,7 +87,7 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-3xl max-w-md w-full m-4 p-6">
         <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {objectif ? "Modifier l'objectif" : "Nouvel objectif"}
+            {objectif ? "Modifier l&apos;objectif" : "Nouvel objectif"}
           </h3>
           <button
             onClick={onClose}
@@ -88,10 +99,9 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          {/* Champ titre */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Titre de l'objectif *
+              Titre de l&apos;objectif *
             </label>
             <input
               type="text"
@@ -103,7 +113,6 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
             />
           </div>
 
-          {/* Champ description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description
@@ -117,7 +126,6 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
             />
           </div>
 
-          {/* Type et cible */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -155,7 +163,6 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
             </div>
           </div>
 
-          {/* Dates */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -163,11 +170,10 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
               </label>
               <input
                 type="date"
-                min={today} // 🔒 empêche une date antérieure à aujourd'hui
+                min={today}
                 value={formData.dateDebut}
                 onChange={(e) => {
                   const newDebut = e.target.value;
-                  // ajuste la date de fin si elle devient avant la date de début
                   if (formData.dateFin < newDebut) {
                     setFormData({ ...formData, dateDebut: newDebut, dateFin: newDebut });
                   } else {
@@ -186,7 +192,7 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
               </label>
               <input
                 type="date"
-                min={formData.dateDebut} // 🔒 empêche une date de fin avant le début
+                min={formData.dateDebut}
                 value={formData.dateFin}
                 onChange={(e) => setFormData({ ...formData, dateFin: e.target.value })}
                 required
@@ -196,7 +202,6 @@ const ObjectifModal = ({ isOpen, onClose, onSave, objectif, loading }: ObjectifM
             </div>
           </div>
 
-          {/* Boutons */}
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"

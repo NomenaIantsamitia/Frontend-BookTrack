@@ -22,15 +22,12 @@ export default function ChangeStatusModal({
   const [error, setError] = useState("");
   const [utilisateurId, setUtilisateurId] = useState<string>("");
 
-  // ✅ Récupération de l'utilisateur connecté et préremplissage des avis
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
       const utilisateur = JSON.parse(userData);
       setUtilisateurId(utilisateur.id);
       
-      // ✅ Préremplir les champs si l'utilisateur a déjà un avis sur ce livre
-      // Maintenant utilisateurId est défini, on peut comparer
       if (livre.avis && livre.avis.length > 0) {
         const avisUser = livre.avis.find((a) => a.utilisateurId === utilisateur.id);
         if (avisUser) {
@@ -40,7 +37,7 @@ export default function ChangeStatusModal({
         }
       }
     }
-  }, [livre]); // Retirer utilisateurId des dépendances
+  }, [livre]);
 
   const handleSave = async () => {
     if (!utilisateurId) {
@@ -57,7 +54,6 @@ export default function ChangeStatusModal({
       setLoading(true);
       setError("");
   
-      // 1. Calculer le statut automatiquement
       let nouveauStatut = "A_LIRE";
       if (pagesLues === 0) {
         nouveauStatut = "A_LIRE";
@@ -67,28 +63,24 @@ export default function ChangeStatusModal({
         nouveauStatut = "EN_COURS";
       }
   
-      // 2. Mettre à jour le statut et les pages lues du livre
       await api.put(`/livres/${livre.id}/statut`, {
         statut: nouveauStatut,
         pagesLues: pagesLues,
       });
   
-      // 3. Ensuite mettre à jour l'avis (si note ou contenu)
       if (note !== undefined || contenu) {
         await api.post("/avis", {
           livreId: livre.id,
           utilisateurId,
           note,
           contenu,
-          pagesLues, // On envoie aussi pagesLues pour la cohérence
+          pagesLues,
         });
       }
   
-      // 4. Récupérer le livre mis à jour
       const updatedRes = await api.get(`/livres/${livre.id}`);
       const updatedLivre = updatedRes.data;
   
-      // 5. Formatter comme dans la page principale
       const formattedLivre = {
         ...updatedLivre,
         statut: (updatedLivre.statut || "A_LIRE").toUpperCase().replace(" ", "_"),
@@ -118,7 +110,7 @@ export default function ChangeStatusModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-          Mettre à jour le statut de "{livre.titre}"
+          Mettre à jour le statut de &ldquo;{livre.titre}&rdquo;
         </h2>
 
         {/* Pages lues */}
