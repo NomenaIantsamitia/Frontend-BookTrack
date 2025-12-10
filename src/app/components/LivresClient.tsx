@@ -137,7 +137,7 @@ export default function LivresPage() {
     onClose={() => setSelectedLivre(null)}
     onUpdated={async () => {
       await fetchLivresUtilisateur(); // 🔁 Recharge depuis l’API
-      setSelectedLivre(null); // 🔒 Ferme la modale
+      setSelectedLivre(null); 
     }}
   />
 )}
