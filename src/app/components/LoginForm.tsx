@@ -17,7 +17,7 @@ interface LoginFormData {
 export default function LoginForm({ setMessage }: LoginFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<LoginFormData>({ email: "", motDePasse: "" });
+  const [form, setForm] = useState<LoginFormData>({ email: "test123@gmail.com", motDePasse: "123456" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
